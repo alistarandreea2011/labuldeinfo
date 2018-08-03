@@ -443,5 +443,4 @@ function initializeazaJoc() {
 
   function randeaza() {
   }
-}
 
