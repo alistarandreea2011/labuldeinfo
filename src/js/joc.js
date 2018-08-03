@@ -29,7 +29,6 @@ let coordonateMonede = [
   {X: 550, Y:100},
   {X: 600, Y:100},
 ];
-let broasca;
 let broaste;
 let coordonateStele = [
   {X: 650, Y:300},
