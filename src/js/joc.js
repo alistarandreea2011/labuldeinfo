@@ -3,6 +3,7 @@
  ###########################################################*/
 let joc;
 let jucator;
+let broasca;
 let platforme;
 let jucatorulACastigat = false;
 let scor = 0;
@@ -17,6 +18,7 @@ let variabile;
 let jucatorulAPierdut = false;
 let mesajPierdere;
 let otravuri;
+let broascaMiscatoare;
 let monede = [];
 let stele;
 let powerUp = 0;
@@ -35,6 +37,11 @@ let coordonateStele = [
   {X: 250, Y:200},
 ];
 
+
+let coordonateBroasca = {
+  min: 300,
+  max: 600
+};
 
 /*##########################################################
  ***                       Functii                       ***
@@ -87,6 +94,8 @@ function adaugaPlatforme() {
   platforme.create(350, 540, 'platforma');
   platforme.setAll('body.immovable', true);
 }
+
+
 
 /***********************************************
  * Initializeaza obiecte si le adauga pe ecran *
@@ -157,6 +166,21 @@ function initializeazaBroasca(x, y) {
   broasca.body.collideWorldBounds = true;
 
 
+/******
+ * Anti-Erou
+ */
+ 
+function adaugaBroasca() {
+  broaste = joc.add.physicsGroup();
+  broascaMiscatoare = broaste.create(400, 120, 'broasca');
+
+  broascaMiscatoare.animations.add('mers');
+  broascaMiscatoare.animations.play('mers', 6, true);
+  broascaMiscatoare.body.collideWorldBounds = true;
+  broascaMiscatoare.body.velocity.x = 50; 
+  broascaMiscatoare.anchor.setTo(0.5, 0);
+}
+
 }
 /****************************************************
  * Primeste un obiect ca parametru, modifica scor
@@ -184,6 +208,15 @@ function managerInsignaVictorie(jucator, insigna) {
  ***************************************************/
 function managerOtrava (jucator, otrava) {
   otrava.kill();
+  jucator.kill();
+  jucatorulAPierdut = true;
+}
+/************************
+ jucatorul atinge broasca
+*************************/
+
+function managerBroasca (jucator, broascaMiscatoare) {
+  broascaMiscatoare.kill();
   jucator.kill();
   jucatorulAPierdut = true;
 }
@@ -230,6 +263,7 @@ function initializeazaJoc() {
 
     // De ce 32, 32, uhm?...
     joc.load.spritesheet('otrava', 'src/img/otrava.png', 32, 32); 
+    joc.load.spritesheet ('broasca','src/img/broasca.png' , 32,32);
     joc.load.spritesheet('stea', 'src/img/stea.png', 32, 32); 
   }
 
@@ -279,6 +313,16 @@ function initializeazaJoc() {
     joc.physics.arcade.overlap(jucator, stele, managerStea);
 
     jucator.body.velocity.x = 0;
+    
+    //Broasca Stanga-dreapta
+
+    if ( broascaMiscatoare.x > coordonateBroasca.max) {
+      broascaMiscatoare.body.velocity.x = -50;
+      broascaMiscatoare.scale.x *= -1;
+    }else if (broascaMiscatoare.x < coordonateBroasca.min){
+      broascaMiscatoare.body.velocity.x = 50;
+      broascaMiscatoare.scale.x *= -1;
+    }
 
     for (i = 0; i < monede.length; i++) {
       if (monede[i].x > coordonateMonede[i].X + 30) {
@@ -297,6 +341,9 @@ function initializeazaJoc() {
       broasca.scale.x = 1;
     }
 
+    // Conditie saritura
+    if ((butonSaritura.isDown || tasteNavigare.up.isDown) && (jucator.body.onFloor() || jucator.body.touching.down)) {
+      jucator.body.velocity.y = -400;
     // Este sageata stanga apasata?
     if (powerUp == 0) {
       if (tasteNavigare.left.isDown) {
